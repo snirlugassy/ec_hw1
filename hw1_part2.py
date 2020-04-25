@@ -78,7 +78,7 @@ def new_w(w):
 
 def competitive_part(links_dataset , number):
     # Edge Filtering
-    k = 50
+    k = 1
     G = nx.from_pandas_edgelist(links_dataset.init_graph, 'target', 'source', edge_attr=True, create_using=nx.Graph())
     removed_edges = list()
     for i in range(number // k):
