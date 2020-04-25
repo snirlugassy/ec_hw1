@@ -78,24 +78,25 @@ def new_w(w):
 
 def competitive_part(links_dataset , number):
     # Edge Filtering
+    # k = number of edges we remove per iteration
     k = 1
     G = nx.from_pandas_edgelist(links_dataset.init_graph, 'target', 'source', edge_attr=True, create_using=nx.Graph())
     removed_edges = list()
     for i in range(number // k):
         print("iter = ", i)
 
-        bridges = list(nx.bridges(G))
-        # ranking = nx.pagerank(G)
+        # bridges = list(nx.bridges(G))
+        ranking = nx.katz_centrality(G, max_iter=100, weight='weight')
+        mean_katz_centrality = np.mean(list(ranking.values()))
         weight_dict = dict()
 
         # reweight edges
         for edge in G.edges():
-            node1 = edge[0]
-            node2 = edge[1]
-            deg1 = len(list(G.neighbors(node1)))
-            deg2 = len(list(G.neighbors(node2)))
-            weight = G[node1][node2]['weight']
-            weight_dict[node1, node2] = np.log(deg1 * deg2) * new_w(weight) * (edge not in bridges)
+            WG = G.copy()
+            WG.remove_edge(edge[0], edge[1])
+            _katz = nx.katz_centrality(G, max_iter=100, weight='weight')
+            _mean_katz_centrality = np.mean(list(ranking.values()))
+            weight_dict[edge] = mean_katz_centrality - _mean_katz_centrality
 
                 
         # sort descending
@@ -109,10 +110,6 @@ def competitive_part(links_dataset , number):
             removed_edges.append(edge)
             G.remove_edge(edge[0], edge[1])
             i += 1
-
-    while len(removed_edges) < number:
-        removed_edges.append(local_bridges[-1])
-        local_bridges = local_bridges[:-1]
 
     return removed_edges
 
