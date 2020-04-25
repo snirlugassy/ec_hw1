@@ -6,6 +6,7 @@ import random
 import csv
 from scipy.special import comb
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 random.seed(0)
 
 class ModelData:
@@ -79,7 +80,7 @@ def new_w(w):
 def competitive_part(links_dataset , number):
     # Edge Filtering
     # k = number of edges we remove per iteration
-    k = 1
+    k = 1000
     G = nx.from_pandas_edgelist(links_dataset.init_graph, 'target', 'source', edge_attr=True, create_using=nx.Graph())
     removed_edges = list()
     for i in range(number // k):
@@ -92,9 +93,10 @@ def competitive_part(links_dataset , number):
 
         # reweight edges
         for edge in G.edges():
+            print(edge)
             WG = G.copy()
             WG.remove_edge(edge[0], edge[1])
-            _katz = nx.katz_centrality(G, max_iter=100, weight='weight')
+            _katz = nx.katz_centrality(G, max_iter=20, weight='weight', tol=10e-4)
             _mean_katz_centrality = np.mean(list(ranking.values()))
             weight_dict[edge] = mean_katz_centrality - _mean_katz_centrality
 
