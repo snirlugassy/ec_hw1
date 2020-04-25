@@ -56,7 +56,7 @@ def plot_histogram(G, alpha, beta):
     return
 
 def G_features(G):
-    closeness = nx.closeness_centrality(G)
+    closeness = nx.closeness_centrality(G,wf_improved=False)
     betweeness = nx.betweenness_centrality(G)
     return {'Closeness': closeness,'Betweeness':betweeness}
 
